@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HiteBot</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .chat-container {
+      width: 90%;
+      max-width: 600px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .chat-header {
+      background-color: #0078D7;
+      color: white;
+      padding: 20px;
+      font-size: 24px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .chat-messages {
+      padding: 20px;
+      height: 400px;
+      overflow-y: auto;
+      font-size: 16px;
+    }
+
+    .chat-input {
+      display: flex;
+      padding: 20px;
+      border-top: 1px solid #ccc;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      margin-left: 10px;
+      padding: 10px 16px;
+      font-size: 16px;
+      background-color: #0078D7;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="chat-container">
+  <div class="chat-header">🤖 Welcome to HiteBot!</div>
+  <div class="chat-messages" id="messages"></div>
+  <div class="chat-input">
+    <input type="text" id="userInput" placeholder="Type a message..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
+
+<script>
+  function sendMessage() {
+    const input = document.getElementById("userInput");
+    const message = input.value.trim();
+    const messagesDiv = document.getElementById("messages");
+
+    if (message !== "") {
+      messagesDiv.innerHTML += `<div><strong>You:</strong> ${message}</div>`;
+
+      fetch("http://localhost:5000/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_input: message })
+      })
+      .then(res => res.json())
+      .then(data => {
+        messagesDiv.innerHTML += `<div><strong>HiteBot:</strong> ${data.response}</div>`;
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      })
+      .catch(err => {
+        messagesDiv.innerHTML += `<div><strong>HiteBot:</strong> Sorry, couldn't reach the server. 🛠️</div>`;
+      });
+
+      input.value = "";
+    }
+  }
+</script>
+
+</body>
+</html>
